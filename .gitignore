@@ -1,0 +1,7 @@
+# Remove files from Project
+
+.idea/
+.venv/
+
+BTS_Claude/
+Data/
