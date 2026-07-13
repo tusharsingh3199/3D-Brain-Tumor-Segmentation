@@ -1,3 +1,2 @@
-import tensorflow
+print("tote ki choch tooti")
 
-print("Tensor.....")
