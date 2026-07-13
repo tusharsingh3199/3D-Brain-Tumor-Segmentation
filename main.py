@@ -1,3 +1,1 @@
-import tensorflow
-
 print("Tensor")
