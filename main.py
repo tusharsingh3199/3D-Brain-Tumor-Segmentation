@@ -1,2 +1,2 @@
-print("tote ki choch tooti")
+print("aastha is my name")
 
