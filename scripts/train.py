@@ -1,10 +1,10 @@
 import os
 import tensorflow as tf
 
-from src.data.EDA import EDA
-from src.data.loader import patients_dir
-from src.data.dataset import tf_load_patient
-from src.models.model_3UNet import Model_3UNet
+from src.preprocessing.EDA import EDA
+from src.preprocessing.loader import patients_dir
+from src.preprocessing.dataset import tf_load_patient
+from src.SegmentationModels.model_3UNet import Model_3UNet
 from src.training.DiceLoss import Dice, Loss, callbacks
 from src.training.mri_results import MRI_Results
 from src.training.plots import plot_loss
