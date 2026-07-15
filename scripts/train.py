@@ -39,7 +39,7 @@ if not ("3D_UNet.keras" in os.listdir(Data_Path + "\Models")) and "unet" in mode
 
     plot_loss(history)
     UNET_Model.evaluate(test_dataset)
-    UNET_Model.save(Data_Path + r"Model\3D_UNet.keras")
+    UNET_Model.save(Data_Path + r"\Model\3D_UNet.keras")
 
 
 if not ("Swin_UNETR.keras" in os.listdir(Data_Path + "\Models")) and "swin_unetr" in models:
@@ -50,7 +50,7 @@ if not ("Swin_UNETR.keras" in os.listdir(Data_Path + "\Models")) and "swin_unetr
 
     plot_loss(history)
     Swin_UNETR.evaluate(test_dataset)
-    Swin_UNETR.save(Data_Path + r"Model\Swin_UNETR.keras")
+    Swin_UNETR.save(Data_Path + r"\Model\Swin_UNETR.keras")
 
 
 # Results
