@@ -61,4 +61,4 @@ Swin_UNETR = tf.keras.models.load_model(Data_Path + r"\Models\Swin_UNETR.keras",
             custom_objects={"Loss": Loss, "Dice": Dice, "Dice_NCR": Dice_NCR, "Dice_ED": Dice_ED, "Dice_ET": Dice_ET})
 
 MRI_Results(test_dir, UNET_Model)
-MRI_Results(test_dir, UNET_Model)
+MRI_Results(test_dir, Swin_UNETR)
