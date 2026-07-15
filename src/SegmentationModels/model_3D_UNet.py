@@ -43,3 +43,8 @@ def Model_3UNet(input_shape=(128, 128, 128, 4), num_classes=4):
     return tf.keras.Model(inputs, outputs, name="3D_U-Net")
 
 
+callbacks = [
+        tf.keras.callbacks.ModelCheckpoint("3D_UNet.keras", save_best_only=True, monitor="val_Dice", mode="max"),
+        tf.keras.callbacks.EarlyStopping(monitor="val_Dice", mode="max", patience=3, restore_best_weights=True),
+        tf.keras.callbacks.ReduceLROnPlateau(monitor="val_Loss", factor=0.5, patience=3, mode="min")
+    ]

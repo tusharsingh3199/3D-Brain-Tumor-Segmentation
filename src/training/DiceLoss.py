@@ -2,6 +2,7 @@ import tensorflow as tf
 
 CLASS_WEIGHTS = tf.constant([0.05, 0.25, 0.35, 0.35], dtype=tf.float32)
 
+
 def Dice_Class(y_true, y_pred, class_idx):
     y_true = tf.one_hot(tf.cast(y_true, tf.int32), depth=4)
     y_pred = tf.one_hot(tf.argmax(y_pred, axis=-1), depth=4)
@@ -15,14 +16,18 @@ def Dice_Class(y_true, y_pred, class_idx):
     dice = (2. * intersection + smooth) / (union + smooth)
     return tf.reduce_mean(dice)
 
+
 def Dice_NCR(y_true, y_pred):
     return Dice_Class(y_true, y_pred, 1)
+
 
 def Dice_ED(y_true, y_pred):
     return Dice_Class(y_true, y_pred, 2)
 
+
 def Dice_ET(y_true, y_pred):
     return Dice_Class(y_true, y_pred, 3)
+
 
 def Dice(y_true, y_pred):
     y_true = tf.one_hot(tf.cast(y_true, tf.int32), depth=4)
@@ -33,6 +38,7 @@ def Dice(y_true, y_pred):
 
     dice = (2. * intersection + smooth) / (union + smooth)
     return tf.reduce_mean(dice)
+
 
 def Loss(y_true, y_pred):
     ce = tf.keras.losses.SparseCategoricalCrossentropy()(y_true, y_pred)
@@ -48,9 +54,3 @@ def Loss(y_true, y_pred):
     dice_loss = 1.0 - weighted_dice
     return dice_loss + ce
 
-
-callbacks = [
-    tf.keras.callbacks.ModelCheckpoint("3D_UNet.keras", save_best_only=True, monitor="val_Dice", mode="max"),
-    tf.keras.callbacks.EarlyStopping(monitor="val_Dice", mode="max", patience=3, restore_best_weights=True),
-    tf.keras.callbacks.ReduceLROnPlateau(monitor="val_Loss", factor=0.5, patience=3, mode="min")
-]
