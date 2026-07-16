@@ -61,7 +61,7 @@ if Show_MRI:
         MRI_Results(test_dir, UNET_Model)
 
     if "swin_unetr" in MODELS:
-        Swin_UNETR = tf.keras.models.load_model("/kaggle/working/Swin_UNETR.keras",
+        Swin_UNETR = tf.keras.models.load_model(DATA_PATH + r"\Models\Swin_UNETR.keras",
                      custom_objects={"SwinEncoder": SwinEncoder,
                                      "PatchMerging3D": PatchMerging3D,
                                      "SwinTransformerBlock3D": SwinTransformerBlock3D,
