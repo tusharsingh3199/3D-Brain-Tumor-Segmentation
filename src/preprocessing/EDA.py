@@ -5,6 +5,7 @@ import nibabel as nib
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
+from configs.config import *
 
 
 def EDA(patients_dir):
@@ -12,7 +13,7 @@ def EDA(patients_dir):
     patient_dir = secrets.choice(patients_dir)
     img = []
     seg = []
-    for modality in ["t1", "t1ce", "t2", "flair"]:
+    for modality in MODALITIES:
         v = nib.load(os.path.join(patient_dir, f"{os.path.basename(patient_dir)}_{modality}.nii")).get_fdata().astype(np.float32)
         v = (v - v.min()) / (v.max() - v.min() + 1e-8)
         img.append(v)

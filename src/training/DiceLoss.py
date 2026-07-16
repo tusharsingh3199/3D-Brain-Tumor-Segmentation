@@ -1,6 +1,5 @@
 import tensorflow as tf
-
-CLASS_WEIGHTS = tf.constant([0.05, 0.25, 0.35, 0.35], dtype=tf.float32)
+from configs.config import CLASS_WEIGHTS
 
 
 def Dice_Class(y_true, y_pred, class_idx):
@@ -46,8 +45,8 @@ def Loss(y_true, y_pred):
     y_pred = tf.clip_by_value(y_pred, 1e-6, 1. - 1e-6)
 
     smooth = 1e-6
-    intersection = tf.reduce_sum(y_true * y_pred, axis=[1,2,3])
-    union = tf.reduce_sum(y_true + y_pred, axis=[1,2,3])
+    intersection = tf.reduce_sum(y_true * y_pred, axis=[1, 2, 3])
+    union = tf.reduce_sum(y_true + y_pred, axis=[1, 2, 3])
 
     dice = (2. * intersection + smooth) / (union + smooth)
     weighted_dice = tf.reduce_sum(dice * CLASS_WEIGHTS) / tf.reduce_sum(CLASS_WEIGHTS)

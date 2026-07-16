@@ -3,9 +3,9 @@ import nibabel as nib
 import matplotlib.pyplot as plt
 import requests
 import streamlit as st
+from configs.config import *
 
 API_URL = "http://localhost:8000/segment"
-MODALITIES = ["t1", "t1ce", "t2", "flair"]
 
 st.set_page_config(layout="wide")
 st.title(" Brain Tumor Segmentation")
@@ -63,9 +63,5 @@ if "seg_bytes" in st.session_state:
     ax[1, 0].set_ylabel("+ Segmentation", fontsize=12)
     st.pyplot(fig)
 
-    st.download_button(
-        "⬇Download seg.nii.gz",
-        data=st.session_state["seg_bytes"],
-        file_name="seg.nii.gz",
-        mime="application/gzip",
-    )
+    st.download_button("Download seg.nii.gz", data=st.session_state["seg_bytes"],
+                       file_name="seg.nii.gz", mime="application/gzip", )

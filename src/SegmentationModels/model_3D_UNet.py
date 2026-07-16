@@ -1,4 +1,5 @@
 import tensorflow as tf
+from configs.config import *
 
 
 def conv_block(x, filters):
@@ -20,7 +21,7 @@ def decoder_block(x, skip, filters):
     return x
 
 
-def Model_3UNet(input_shape=(128, 128, 128, 4), num_classes=4):
+def Model_3UNet(input_shape=IMAGE_SHAPE, num_classes=CLASSES):
     inputs = tf.keras.Input(input_shape)
 
     s1 = conv_block(inputs, 16)

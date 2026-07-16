@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+from configs.config import *
 
 
 def window_partition(x, window_size):
@@ -221,15 +222,9 @@ class SwinEncoder(tf.keras.layers.Layer):
         return skips
 
 
-def Model_SwinUNETR(
-    input_shape=(128, 128, 128, 4),
-    num_classes=4,
-    patch_size=2,
-    embed_dim=24,
-    depths=(2, 2, 2, 2),
-    num_heads=(3, 6, 12, 24),
-    window_size=(4, 4, 4),
-):
+def Model_SwinUNETR(input_shape=IMAGE_SHAPE, num_classes=CLASSES, patch_size=patch_size, embed_dim=embed_dim,
+                    depths=depths, num_heads=num_heads, window_size=window_size,):
+
     inputs = tf.keras.Input(input_shape)
     dims = [embed_dim * (2 ** i) for i in range(len(depths))]
 
@@ -246,6 +241,7 @@ def Model_SwinUNETR(
 
     outputs = tf.keras.layers.Conv3D(num_classes, kernel_size=1, activation="softmax")(d)
     return tf.keras.Model(inputs, outputs, name="Swin_UNETR")
+
 
 callbacks = [
         tf.keras.callbacks.ModelCheckpoint("Swin_UNETR.keras", save_best_only=True, monitor="val_dice", mode="max"),

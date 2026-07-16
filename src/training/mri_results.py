@@ -5,6 +5,30 @@ from matplotlib.widgets import Slider
 import nibabel as nib
 import numpy as np
 import tensorflow as tf
+from configs.config import *
+
+
+def sliding_window_predict(img, model):
+    H, W, D, _ = img.shape
+    prediction = np.zeros((H, W, D, 4), dtype=np.float32)
+    count_map = np.zeros((H, W, D, 1), dtype=np.float32)
+
+    xs = list(range(0, H - PATCH_SIZE[0] + 1, STRIDE[0])) + [H - PATCH_SIZE[0]]
+    ys = list(range(0, W - PATCH_SIZE[1] + 1, STRIDE[1])) + [W - PATCH_SIZE[1]]
+    zs = list(range(0, D - PATCH_SIZE[2] + 1, STRIDE[2])) + [D - PATCH_SIZE[2]]
+    xs, ys, zs = sorted(set(xs)), sorted(set(ys)), sorted(set(zs))
+
+    for x in xs:
+        for y in ys:
+            for z in zs:
+                patch = img[x:x + PATCH_SIZE[0], y:y + PATCH_SIZE[1], z:z + PATCH_SIZE[2], :]
+                patch = np.expand_dims(patch, axis=0)
+                pred = model.predict(patch, verbose=0)[0]
+                prediction[x:x + PATCH_SIZE[0], y:y + PATCH_SIZE[1], z:z + PATCH_SIZE[2]] += pred
+                count_map[x:x + PATCH_SIZE[0], y:y + PATCH_SIZE[1], z:z + PATCH_SIZE[2]] += 1
+
+    prediction /= count_map
+    return np.argmax(prediction, axis=-1).astype(np.uint8)
 
 
 def MRI_Results(patients_dir, model):
@@ -12,7 +36,7 @@ def MRI_Results(patients_dir, model):
     images = []
     patient_id = os.path.basename(patient_dir)
 
-    for modality in ["t1", "t1ce", "t2", "flair"]:
+    for modality in MODALITIES:
         volume = nib.load(os.path.join(patient_dir, f"{patient_id}_{modality}.nii")).get_fdata().astype(np.float32)
         volume = (volume - volume.min()) / (volume.max() - volume.min() + 1e-8)
         images.append(volume)
@@ -20,37 +44,7 @@ def MRI_Results(patients_dir, model):
     img = np.stack(images, axis=-1)
     seg = nib.load(os.path.join(patient_dir, f"{patient_id}_seg.nii")).get_fdata().astype(np.int32)
     seg[seg == 4] = 3
-
-    H, W, D, C = (240, 240, 155, 4)
-    patch_size = (128, 128, 128)
-    stride = (64, 64, 64)
-
-    prediction = np.zeros((H, W, D, 4), dtype=np.float32)
-    count_map = np.zeros((H, W, D, 1), dtype=np.float32)
-
-    xs = list(range(0, H - patch_size[0] + 1, stride[0]))
-    ys = list(range(0, W - patch_size[1] + 1, stride[1]))
-    zs = list(range(0, D - patch_size[2] + 1, stride[2]))
-
-    if xs[-1] != H - patch_size[0]:
-        xs.append(H - patch_size[0])
-    if ys[-1] != W - patch_size[1]:
-        ys.append(W - patch_size[1])
-    if zs[-1] != D - patch_size[2]:
-        zs.append(D - patch_size[2])
-
-    for x in xs:
-        for y in ys:
-            for z in zs:
-                patch = img[x:x+patch_size[0], y:y+patch_size[1], z:z+patch_size[2], : ]
-                patch = np.expand_dims(patch, axis=0)
-                pred = model.predict(patch, verbose=0)[0]
-
-                prediction[x:x+patch_size[0], y:y+patch_size[1], z:z+patch_size[2]] += pred
-                count_map[x:x+patch_size[0], y:y+patch_size[1], z:z+patch_size[2]] += 1
-
-    prediction /= count_map
-    prediction = np.argmax(prediction, axis=-1)
+    prediction = sliding_window_predict(img, model)
 
     fig, ax = plt.subplots(3, 4, figsize=(12, 6))
     fig.canvas.manager.set_window_title("MRI Brain Tumor Prediction Results")

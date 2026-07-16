@@ -2,6 +2,7 @@ import os
 import zipfile
 import kaggle
 import random
+from configs.config import *
 
 
 def download_data(data_dir):
@@ -26,7 +27,7 @@ def patients_dir(Data_Path, seed=42):
     Data_Path = os.path.join(Data_Path, folders[0])
 
     patient_dir = []
-    for grade in ["HGG", "LGG"]:
+    for grade in TUMOR:
         grade_dir = os.path.join(Data_Path, grade)
         patients = sorted(os.listdir(grade_dir))
         patient_paths = [os.path.join(grade_dir, p) for p in patients]
