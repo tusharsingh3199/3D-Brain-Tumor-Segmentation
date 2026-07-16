@@ -222,7 +222,7 @@ class SwinEncoder(tf.keras.layers.Layer):
         return skips
 
 
-def Model_SwinUNETR(input_shape=(128, 128, 128, 4), num_classes=4, patch_size=2, embed_dim=24,
+def Model_SwinUNETR(input_shape=(128, 128, 128, 4), num_classes=4, patch_size=2, embed_dim=48,
                     depths=(2, 2, 2, 2), num_heads=(3, 6, 12, 24), window_size=(4, 4, 4),):
 
     inputs = tf.keras.Input(input_shape)
