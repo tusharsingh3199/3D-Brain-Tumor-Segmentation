@@ -44,8 +44,11 @@ async def segment(model: str = Form(...), t1: UploadFile = File(...), t1ce: Uplo
         images.append(volume)
 
     img = np.stack(images, axis=-1)
-
-    seg = sliding_window_predict(img, UNET)
+    if model == "UNET":
+        seg = sliding_window_predict(img, UNET)
+    if model == "SwinUNETR":
+        seg = sliding_window_predict(img, SwinUNETR)
+        
     seg[seg == 3] = 4
     out_path = os.path.join(tmp_dir, "seg.nii.gz")
     nib.save(nib.Nifti1Image(seg, ref_nii.affine), out_path)
