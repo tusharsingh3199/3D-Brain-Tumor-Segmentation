@@ -1,3 +1,4 @@
+import os
 import tensorflow as tf
 
 # Data Paths
@@ -23,13 +24,6 @@ EPOCHS = 10
 TRAIN_MODEL = []
 Show_MRI = False
 
-
-# Swin UNETR parameters
-patch_size = 2
-embed_dim = 48
-depths = (2, 2, 2, 2)
-num_heads = (3, 6, 12, 24)
-window_size = (4, 4, 4)
 
 
 
