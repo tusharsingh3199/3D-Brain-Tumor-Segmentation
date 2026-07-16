@@ -72,9 +72,10 @@ scripts/api.py  ── sliding-window inference (Gaussian-free average, 128³ pa
 scripts/streamlit_app.py  ── upload scans, view slice-by-slice overlay, download seg.nii.gz
 ```
 
-`Models/3D_UNet.keras` is the artifact the API loads at startup. Swapping in
-`Swin_UNETR.keras` (by changing `MODEL_PATH` in `scripts/api.py`) requires no
-other code changes.
+Both `Models/3D_UNet.keras` and `Models/Swin_UNETR.keras` are loaded at API
+startup. The `/segment` endpoint takes a `model` field (`"UNET"` or
+`"SwinUNETR"`) so you can pick which one to run inference with per request —
+no restart or code change needed to switch models.
 
 ## Setup
 
@@ -119,16 +120,22 @@ streamlit run scripts/streamlit_app.py
 
 ### Using the web UI
 1. Open `http://localhost:8501`.
-2. Upload the 4 MRI modalities: T1, T1ce, T2, FLAIR (`.nii` / `.nii.gz`).
-3. Click **Run Segmentation** — the API runs sliding-window inference and
-   returns the predicted mask.
-4. Use the slider to scroll through slices; the top row shows the raw scans,
+2. Select which model to run: **UNET** or **SwinUNETR**.
+3. Upload the 4 MRI modalities: T1, T1ce, T2, FLAIR (`.nii` / `.nii.gz`).
+4. Click **Run Segmentation** — the API runs sliding-window inference with
+   the selected model and returns the predicted mask.
+5. Use the slider to scroll through slices; the top row shows the raw scans,
    the bottom row shows the scans with the predicted tumor regions overlaid.
-5. Click **Download seg.nii.gz** to save the segmentation mask.
+6. Click **Download seg.nii.gz** to save the segmentation mask.
 
 ### Using the API directly
+Both trained models (`3D_UNet.keras` and `Swin_UNETR.keras`) are loaded at
+startup. Pick which one to run inference with via the `model` form field —
+`"UNET"` or `"SwinUNETR"`.
+
 ```bash
 curl -X POST http://localhost:8000/segment \
+  -F "model=UNET" \
   -F "t1=@patient_t1.nii" \
   -F "t1ce=@patient_t1ce.nii" \
   -F "t2=@patient_t2.nii" \
