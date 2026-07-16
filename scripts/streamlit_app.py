@@ -10,7 +10,7 @@ st.set_page_config(layout="wide")
 st.title(" Brain Tumor Segmentation")
 st.write("Upload the 4 MRI modalities (.nii files), run segmentation, and scroll through slices.")
 
-selected_model = st.selectbox("Choose Segmentation Model", ["UNet", "SwinUNETR"])
+selected_model = st.selectbox("Choose Segmentation Model", ["UNET", "SwinUNETR"])
 
 uploads = {}
 cols = st.columns(4)
