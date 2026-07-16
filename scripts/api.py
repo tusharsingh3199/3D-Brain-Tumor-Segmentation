@@ -8,6 +8,7 @@ from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.responses import FileResponse
 
 from src.training.DiceLoss import *
+from src.SegmentationModels import model_3D_UNet, model_SwinUNETR
 from configs.config import *
 from src.training.mri_results import sliding_window_predict
 
@@ -18,7 +19,12 @@ UNET = tf.keras.models.load_model(DATA_PATH + r"\Models\3D_UNet.keras",
     custom_objects={"Loss": Loss, "Dice": Dice, "Dice_NCR": Dice_NCR, "Dice_ED": Dice_ED, "Dice_ET": Dice_ET}, )
 
 SwinUNETR = tf.keras.models.load_model(DATA_PATH + r"\Models\Swin_UNETR.keras",
-    custom_objects={"Loss": Loss, "Dice": Dice, "Dice_NCR": Dice_NCR, "Dice_ED": Dice_ED, "Dice_ET": Dice_ET}, )
+            custom_objects={"SwinEncoder": SwinEncoder,
+                            "PatchMerging3D": PatchMerging3D,
+                            "SwinTransformerBlock3D": SwinTransformerBlock3D,
+                            "WindowAttention3D": WindowAttention3D,
+                            "Loss": Loss, "Dice": Dice, "Dice_NCR": Dice_NCR, 
+                            "Dice_ED": Dice_ED, "Dice_ET": Dice_ET}, )
 
 
 @app.post("/segment")
