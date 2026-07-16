@@ -14,7 +14,7 @@ MASK_SHAPE = (128, 128, 128)
 CLASSES = len(MODALITIES)
 PATCH_SIZE = (128, 128, 128)
 STRIDE = (64, 64, 64)
-CLASS_WEIGHTS = tf.constant([0.05, 0.25, 0.35, 0.35], dtype=tf.float32)
+CLASS_WEIGHTS = tf.constant([0.05, 0.35, 0.2, 0.4], dtype=tf.float32)
 
 
 # Training Parameters
