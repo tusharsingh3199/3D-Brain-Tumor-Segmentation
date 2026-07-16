@@ -3,7 +3,6 @@ import nibabel as nib
 import matplotlib.pyplot as plt
 import requests
 import streamlit as st
-from configs.config import *
 
 API_URL = "http://localhost:8000/segment"
 
@@ -11,11 +10,11 @@ st.set_page_config(layout="wide")
 st.title(" Brain Tumor Segmentation")
 st.write("Upload the 4 MRI modalities (.nii files), run segmentation, and scroll through slices.")
 
-selected_model = st.selectbox("Choose Segmentation Model", ["3D UNet", "Swin UNETR"])
+selected_model = st.selectbox("Choose Segmentation Model", ["UNet", "SwinUNETR"])
 
 uploads = {}
 cols = st.columns(4)
-for col, name in zip(cols, MODALITIES):
+for col, name in zip(cols, ["t1", "t1ce", "t2", "flair"]):
     uploads[name] = col.file_uploader(name.upper(), type=["nii", "nii.gz"])
 
 if st.button("Run Segmentation"):
@@ -51,7 +50,7 @@ if "seg_bytes" in st.session_state:
     z = st.slider("Slice", 0, depth - 1, depth // 2)
 
     fig, ax = plt.subplots(2, 4, figsize=(14, 7))
-    for i, name in enumerate(MODALITIES):
+    for i, name in enumerate(["t1", "t1ce", "t2", "flair"]):
         ax[0, i].imshow(scans[name][:, :, z], cmap="gray")
         ax[0, i].set_title(name.upper())
         ax[0, i].axis("off")

@@ -27,10 +27,17 @@ def start_ui():
 
 
 if __name__ == "__main__":
-    #run_training()
+    run_training()
     api_process = start_api()
     time.sleep(10)
     try:
         start_ui()
     finally:
         api_process.terminate()
+
+
+'''
+cd brain_tumor_segmentation
+uvicorn scripts.api:app --port 8000
+streamlit run scripts/streamlit_app.py
+'''

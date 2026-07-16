@@ -15,12 +15,10 @@ app = FastAPI(title="Brain Tumor Segmentation API")
 
 # Load model once at startup
 UNET = tf.keras.models.load_model(DATA_PATH + r"\Models\3D_UNet.keras",
-    custom_objects={"Loss": Loss, "Dice": Dice, "Dice_NCR": Dice_NCR, "Dice_ED": Dice_ED, "Dice_ET": Dice_ET},
-)
+    custom_objects={"Loss": Loss, "Dice": Dice, "Dice_NCR": Dice_NCR, "Dice_ED": Dice_ED, "Dice_ET": Dice_ET}, )
 
 SwinUNETR = tf.keras.models.load_model(DATA_PATH + r"\Models\Swin_UNETR.keras",
-    custom_objects={"Loss": Loss, "Dice": Dice, "Dice_NCR": Dice_NCR, "Dice_ED": Dice_ED, "Dice_ET": Dice_ET},
-)
+    custom_objects={"Loss": Loss, "Dice": Dice, "Dice_NCR": Dice_NCR, "Dice_ED": Dice_ED, "Dice_ET": Dice_ET}, )
 
 
 @app.post("/segment")
@@ -40,18 +38,14 @@ async def segment(model: str = Form(...), t1: UploadFile = File(...), t1ce: Uplo
     ref_nii = nib.load(paths["t1"])
     images = []
 
-    for m in MODALITIES:
+    for m in ["t1", "t1ce", "t2", "flair"]:
         volume = nib.load(paths[m]).get_fdata().astype(np.float32)
         volume = (volume - volume.min()) / (volume.max() - volume.min() + 1e-8)
         images.append(volume)
 
     img = np.stack(images, axis=-1)
-    seg = []
-    if model == "UNET":
-        seg = sliding_window_predict(img, UNET)
-    if model == "SwinUNETR":
-        seg = sliding_window_predict(img, SwinUNETR)
 
+    seg = sliding_window_predict(img, UNET)
     seg[seg == 3] = 4
     out_path = os.path.join(tmp_dir, "seg.nii.gz")
     nib.save(nib.Nifti1Image(seg, ref_nii.affine), out_path)

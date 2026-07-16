@@ -52,15 +52,16 @@ if "swin_unetr" in TRAIN_MODEL or (not ("Swin_UNETR.keras" in os.listdir(DATA_PA
     Swin_UNETR.save(DATA_PATH + r"\Model\Swin_UNETR.keras")
 
 
-# Results
-UNET_Model = tf.keras.models.load_model(DATA_PATH + r"\Models\3D_UNet.keras",
-                                        custom_objects={"Loss": Loss, "Dice": Dice, "Dice_NCR": Dice_NCR, "Dice_ED": Dice_ED, "Dice_ET": Dice_ET})
-
-Swin_UNETR = tf.keras.models.load_model(DATA_PATH + r"\Models\Swin_UNETR.keras",
-                                        custom_objects={"Loss": Loss, "Dice": Dice, "Dice_NCR": Dice_NCR, "Dice_ED": Dice_ED, "Dice_ET": Dice_ET})
-
+# Model loading and Results
 if Show_MRI:
     if "unet" in MODELS:
+        UNET_Model = tf.keras.models.load_model(DATA_PATH + r"\Models\3D_UNet.keras",
+                custom_objects={"Loss": Loss, "Dice": Dice, "Dice_NCR": Dice_NCR, "Dice_ED": Dice_ED, "Dice_ET": Dice_ET})
+
         MRI_Results(test_dir, UNET_Model)
+
     if "swin_unetr" in MODELS:
+        Swin_UNETR = tf.keras.models.load_model(DATA_PATH + r"\Models\Swin_UNETR.keras",
+                custom_objects={"Loss": Loss, "Dice": Dice, "Dice_NCR": Dice_NCR, "Dice_ED": Dice_ED, "Dice_ET": Dice_ET})
+
         MRI_Results(test_dir, Swin_UNETR)
