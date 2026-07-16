@@ -11,6 +11,8 @@ st.set_page_config(layout="wide")
 st.title(" Brain Tumor Segmentation")
 st.write("Upload the 4 MRI modalities (.nii files), run segmentation, and scroll through slices.")
 
+selected_model = st.selectbox("Choose Segmentation Model", ["3D UNet", "Swin UNETR"])
+
 uploads = {}
 cols = st.columns(4)
 for col, name in zip(cols, MODALITIES):
@@ -22,7 +24,7 @@ if st.button("Run Segmentation"):
     else:
         with st.spinner("Running model inference... this can take a while"):
             files = {name: (f.name, f.getvalue()) for name, f in uploads.items()}
-            response = requests.post(API_URL, files=files)
+            response = requests.post(API_URL, files=files, data={"model": selected_model})
 
         if response.status_code != 200:
             st.error(f"Server error: {response.text}")

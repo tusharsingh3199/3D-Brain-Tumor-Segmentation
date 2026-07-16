@@ -4,7 +4,7 @@ import tempfile
 import numpy as np
 import nibabel as nib
 import tensorflow as tf
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.responses import FileResponse
 
 from src.training.DiceLoss import *
@@ -24,7 +24,7 @@ SwinUNETR = tf.keras.models.load_model(DATA_PATH + r"\Models\Swin_UNETR.keras",
 
 
 @app.post("/segment")
-async def segment(t1: UploadFile = File(...), t1ce: UploadFile = File(...),
+async def segment(model: str = Form(...), t1: UploadFile = File(...), t1ce: UploadFile = File(...),
                   t2: UploadFile = File(...), flair: UploadFile = File(...),):
 
     tmp_dir = tempfile.mkdtemp()
@@ -46,9 +46,13 @@ async def segment(t1: UploadFile = File(...), t1ce: UploadFile = File(...),
         images.append(volume)
 
     img = np.stack(images, axis=-1)
-    seg = sliding_window_predict(img, UNET)
-    seg[seg == 3] = 4
+    seg = []
+    if model == "UNET":
+        seg = sliding_window_predict(img, UNET)
+    if model == "SwinUNETR":
+        seg = sliding_window_predict(img, SwinUNETR)
 
+    seg[seg == 3] = 4
     out_path = os.path.join(tmp_dir, "seg.nii.gz")
     nib.save(nib.Nifti1Image(seg, ref_nii.affine), out_path)
 
