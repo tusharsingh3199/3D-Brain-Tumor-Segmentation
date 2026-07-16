@@ -178,7 +178,7 @@ numbers after training — printed by `UNET_Model.evaluate(test_dataset)` /
 > combine them (e.g. NCR + ET voxels for TC) if you want official BraTS-style
 > region scores instead of per-label scores.
 
-### Target Dice (BraTS 2021 reference benchmarks)
+### Target Dice (BraTS 2019 reference benchmarks)
 
 | Region               | Target Dice |
 |----------------------|-------------|
