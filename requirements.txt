@@ -12,6 +12,7 @@ scipy>=1.10.0
 tqdm>=4.65.0
 pydantic>=2.0.0
 httpx>=0.25.0
+huggingface_hub>=0.20.0
 fastapi
 streamlit
 
