@@ -18,13 +18,18 @@ app = FastAPI(title="Brain Tumor Segmentation API")
  
 HF_REPO_ID = "tusharsingh3199/BrainTumorSegmentation"
  
-unet_path = hf_hub_download(repo_id=HF_REPO_ID, filename="3D_UNet.keras")
-swin_path = hf_hub_download(repo_id=HF_REPO_ID, filename="Swin_UNETR.keras")
+if "3D_UNet.keras" not in os.listdir(os.path.join(DATA_PATH, "Models")):
+    unet_path = hf_hub_download(repo_id=HF_REPO_ID, filename="3D_UNet.keras",
+                                local_dir=os.path.join(DATA_PATH, "Models"))
+
+if "SwinUNETR.keras" not in os.listdir(os.path.join(DATA_PATH, "Models")):
+    swin_path = hf_hub_download(repo_id=HF_REPO_ID, filename="Swin_UNETR.keras",
+                                local_dir=os.path.join(DATA_PATH, "Models"))
  
-UNET = tf.keras.models.load_model(unet_path,
-    custom_objects={"Loss": Loss, "Dice": Dice, "Dice_NCR": Dice_NCR, "Dice_ED": Dice_ED, "Dice_ET": Dice_ET}, )
+UNET = tf.keras.models.load_model(os.path.join(DATA_PATH, "Models", "3D_UNet.keras"),
+       custom_objects={"Loss": Loss, "Dice": Dice, "Dice_NCR": Dice_NCR, "Dice_ED": Dice_ED, "Dice_ET": Dice_ET}, )
  
-SwinUNETR = tf.keras.models.load_model(swin_path,
+SwinUNETR = tf.keras.models.load_model(os.path.join(DATA_PATH, "Models", "Swin_UNETR.keras"),
             custom_objects={"SwinEncoder": SwinEncoder,
                             "PatchMerging3D": PatchMerging3D,
                             "SwinTransformerBlock3D": SwinTransformerBlock3D,
