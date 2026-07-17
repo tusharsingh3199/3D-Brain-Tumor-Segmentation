@@ -22,7 +22,7 @@ if "3D_UNet.keras" not in os.listdir(os.path.join(DATA_PATH, "Models")):
     unet_path = hf_hub_download(repo_id=HF_REPO_ID, filename="3D_UNet.keras",
                                 local_dir=os.path.join(DATA_PATH, "Models"))
 
-if "SwinUNETR.keras" not in os.listdir(os.path.join(DATA_PATH, "Models")):
+if "Swin_UNETR.keras" not in os.listdir(os.path.join(DATA_PATH, "Models")):
     swin_path = hf_hub_download(repo_id=HF_REPO_ID, filename="Swin_UNETR.keras",
                                 local_dir=os.path.join(DATA_PATH, "Models"))
  

@@ -23,6 +23,7 @@ Show_EDA = False
 EPOCHS = 10
 TRAIN_MODEL = []
 Show_MRI = False
+training = False
 
 
 

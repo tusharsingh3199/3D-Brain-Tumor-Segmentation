@@ -6,7 +6,6 @@ from configs.config import *
 PYTHON = sys.executable
 
 DATA_PATH = os.path.dirname(os.path.abspath(__file__))
-training = False         # Set True if you want to train on your pc.
 
 
 def run_training():
