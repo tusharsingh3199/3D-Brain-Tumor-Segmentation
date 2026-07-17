@@ -1,7 +1,8 @@
 import os
 import tensorflow as tf
 
-from src.SegmentationModels import model_3D_UNet, model_SwinUNETR
+from src.SegmentationModels.model_3D_UNet import *
+from src.SegmentationModels.model_SwinUNETR import *
 from src.preprocessing.EDA import EDA
 from src.preprocessing.loader import patients_dir
 from src.preprocessing.dataset import tf_load_patient

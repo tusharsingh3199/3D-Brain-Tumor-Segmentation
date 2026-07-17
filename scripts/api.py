@@ -8,7 +8,8 @@ from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.responses import FileResponse
 
 from src.training.DiceLoss import *
-from src.SegmentationModels import model_3D_UNet, model_SwinUNETR
+from src.SegmentationModels.model_3D_UNet import *
+from src.SegmentationModels.model_SwinUNETR import *
 from configs.config import *
 from src.training.mri_results import sliding_window_predict
 

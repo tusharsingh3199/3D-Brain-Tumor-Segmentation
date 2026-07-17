@@ -45,7 +45,7 @@ if "seg_bytes" in st.session_state:
     with open("_tmp_seg.nii.gz", "wb") as f:
         f.write(st.session_state["seg_bytes"])
     seg = nib.load("_tmp_seg.nii.gz").get_fdata()
-
+    seg[seg == 4] = 3
     depth = scans["t1"].shape[2]
     z = st.slider("Slice", 0, depth - 1, depth // 2)
 
