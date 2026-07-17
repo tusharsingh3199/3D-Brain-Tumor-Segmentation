@@ -12,14 +12,19 @@ from src.SegmentationModels.model_3D_UNet import *
 from src.SegmentationModels.model_SwinUNETR import *
 from configs.config import *
 from src.training.mri_results import sliding_window_predict
+from huggingface_hub import hf_hub_download
 
 app = FastAPI(title="Brain Tumor Segmentation API")
-
-# Load model once at startup
-UNET = tf.keras.models.load_model(os.path.join(DATA_PATH, "Models", "3D_UNet.keras"),
+ 
+HF_REPO_ID = "tusharsingh3199/BrainTumorSegmentation"
+ 
+unet_path = hf_hub_download(repo_id=HF_REPO_ID, filename="3D_UNet.keras")
+swin_path = hf_hub_download(repo_id=HF_REPO_ID, filename="Swin_UNETR.keras")
+ 
+UNET = tf.keras.models.load_model(unet_path,
     custom_objects={"Loss": Loss, "Dice": Dice, "Dice_NCR": Dice_NCR, "Dice_ED": Dice_ED, "Dice_ET": Dice_ET}, )
-
-SwinUNETR = tf.keras.models.load_model(os.path.join(DATA_PATH, "Models", "Swin_UNETR.keras"),
+ 
+SwinUNETR = tf.keras.models.load_model(swin_path,
             custom_objects={"SwinEncoder": SwinEncoder,
                             "PatchMerging3D": PatchMerging3D,
                             "SwinTransformerBlock3D": SwinTransformerBlock3D,
