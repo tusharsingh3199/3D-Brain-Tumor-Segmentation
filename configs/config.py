@@ -2,7 +2,7 @@ import os
 import tensorflow as tf
 
 # Data Paths
-DATA_PATH = r"C:\Users\dell\Documents\Programming Projects\Python\3D Brain tumor Segmentation"
+DATA_PATH = os.path.dirname(os.path.abspath(__file__ + "/.."))
 TUMOR = ["HGG", "LGG"]
 MODALITIES = ["t1", "t1ce", "t2", "flair"]
 
