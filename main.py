@@ -6,7 +6,7 @@ from configs.config import *
 PYTHON = sys.executable
 
 DATA_PATH = os.path.dirname(os.path.abspath(__file__))
-
+training = False         #  Set True if you want to train on your pc. 
 
 def run_training():
     print("\nUse config.py to control Training models....\n")
@@ -27,7 +27,8 @@ def start_ui():
 
 
 if __name__ == "__main__":
-    run_training()
+    if training:
+        run_training()
     api_process = start_api()
     time.sleep(10)
     try:
