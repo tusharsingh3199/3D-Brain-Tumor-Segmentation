@@ -1,6 +1,13 @@
-# 3D Brain Tumor Segmentation (BraTS) — TensorFlow
+# 3D Brain Tumor Segmentation using 3D UNet and Swin UNETR
 
-End-to-end pipeline for 3D brain tumor segmentation on the BraTS 2019 dataset, progressing from a 3D U-Net baseline to a Swin-UNETR transformer, with a FastAPI backend and a Streamlit web UI for uploading MRI scans and viewing segmentation results.
+End-to-end deep learning pipeline for automated brain tumor segmentation from multi-modal MRI scans using **3D U-Net** and **Swin-UNETR**.
+Built with TensorFlow • FastAPI • Streamlit • BraTS 2019 Dataset.
+
+![Python](https://img.shields.io/badge/Python-3.10-blue)
+![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange)
+![FastAPI](https://img.shields.io/badge/FastAPI-Backend-green)
+![Streamlit](https://img.shields.io/badge/Streamlit-Frontend-red)
+![License](https://img.shields.io/badge/License-MIT-blue)
 
 ## Project Structure
 
