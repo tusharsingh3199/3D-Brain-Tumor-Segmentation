@@ -1,13 +1,47 @@
 # 3D Brain Tumor Segmentation using 3D UNet and Swin UNETR
 
 End-to-end deep learning pipeline for automated brain tumor segmentation from multi-modal MRI scans using **3D U-Net** and **Swin-UNETR**.
-Built with TensorFlow • FastAPI • Streamlit • BraTS 2019 Dataset.
+Built with TensorFlow, FastAPI, and Streamlit.
 
 ![Python](https://img.shields.io/badge/Python-3.10-blue)
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Backend-green)
 ![Streamlit](https://img.shields.io/badge/Streamlit-Frontend-red)
 ![License](https://img.shields.io/badge/License-MIT-blue)
+
+## Overview
+
+Brain tumor segmentation is the task of automatically delineating tumor sub-regions in 3D MRI volumes so that clinicians and researchers can analyze tumor size, shape, and location without manually tracing every slice. This project implements a complete, reproducible pipeline for that task: data loading and preprocessing, two independent 3D segmentation architectures, a combined loss/metric suite tailored to class imbalance, a training script, and a deployable inference stack (a FastAPI backend plus a Streamlit front end) so trained models can be used interactively rather than only from a notebook.
+
+Two models are provided so their trade-offs can be compared directly on the same data and evaluation code:
+
+- A convolutional **3D U-Net**, used as a strong, well-understood baseline.
+- A **Swin-UNETR**, which replaces the convolutional encoder with a 3D shifted-window transformer to capture longer-range spatial context.
+
+Both models consume four co-registered MRI modalities per patient (T1, T1ce, T2, FLAIR) stacked as input channels, and predict a voxel-wise segmentation mask distinguishing background from the tumor sub-regions described below.
+
+## Key Features
+
+- Two interchangeable 3D segmentation architectures (3D U-Net and Swin-UNETR) trained and evaluated with the same pipeline.
+- Custom combined Dice and Cross-Entropy loss with class weighting to handle the heavy background/tumor voxel imbalance typical of brain MRI.
+- Per-class Dice metrics tracked during training for necrotic core, edema, and enhancing tumor regions.
+- Patch-based training and sliding-window inference so full-resolution volumes can be processed without exceeding memory limits.
+- REST API (FastAPI) that loads both trained models once at startup and lets the caller choose which model to run per request.
+- Interactive Streamlit UI for uploading scans, running inference, scrolling through slice-by-slice overlays, and downloading the resulting segmentation mask.
+- Trained model weights are pulled automatically from the Hugging Face Hub if not already present locally, so inference can be run without retraining from scratch.
+- Single-command orchestration (`main.py`) that trains missing models and launches both services.
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Modeling | TensorFlow / Keras |
+| Architectures | 3D U-Net, Swin-UNETR (3D Swin Transformer encoder + convolutional decoder) |
+| Data handling | NiBabel (NIfTI I/O), NumPy, SciPy |
+| Backend / inference API | FastAPI, Uvicorn |
+| Frontend | Streamlit |
+| Model distribution | Hugging Face Hub |
+| Experimentation | Jupyter Notebook |
 
 ## Project Structure
 
@@ -58,7 +92,7 @@ brain_tumor_segmentation/
 ## Data Flow / Pipeline
 
 ```
-BraTS 2019 NIfTI files (t1, t1ce, t2, flair, seg)
+Multi-modal MRI NIfTI files (t1, t1ce, t2, flair, seg)
    │
    ▼
 src/data/loader.py + dataset.py     (normalize, remap labels 0,1,2,4 → 0,1,2,3, 128³ patches)
@@ -76,20 +110,46 @@ scripts/api.py  ── sliding-window inference (Gaussian-free average, 128³ pa
 scripts/streamlit_app.py  ── upload scans, view slice-by-slice overlay, download seg.nii.gz
 ```
 
-Both `Models/3D_UNet.keras` and `Models/Swin_UNETR.keras` are loaded at API startup. The `/segment` endpoint takes a `model` field (`"UNET"` or `"SwinUNETR"`) so you can pick which one to run inference with per request — no restart or code change needed to switch models.
+Both `Models/3D_UNet.keras` and `Models/Swin_UNETR.keras` are loaded at API startup. The `/segment` endpoint takes a `model` field (`"UNET"` or `"SwinUNETR"`) so you can pick which one to run inference with per request, with no restart or code change needed to switch models.
+
+## Dataset
+
+This project trains on a multi-modal brain MRI dataset organized by patient, where each patient folder contains four co-registered structural MRI modalities plus a ground-truth segmentation mask:
+
+- **T1** — native T1-weighted scan.
+- **T1ce** — T1-weighted scan with contrast enhancement, which highlights the active tumor boundary.
+- **T2** — T2-weighted scan, sensitive to edema and fluid.
+- **FLAIR** — fluid-attenuated inversion recovery, which suppresses cerebrospinal fluid signal to make lesions more visible.
+- **seg** — the ground-truth voxel-wise label map used as the training target.
+
+Patients are typically grouped into high-grade and low-grade glioma cohorts (HGG/LGG). Each of the four modalities is intensity-normalized independently and stacked along the channel axis, giving a 4-channel 3D input volume per patient. During training, volumes are cropped into fixed-size 3D patches (128³ voxels by default, configurable in `configs/config.py`) to keep GPU memory usage manageable; at inference time the same patch size is applied via a sliding window across the full volume so the whole scan gets segmented.
+
+Labels are remapped from their raw encoding to a compact set of contiguous class indices (0, 1, 2, 3) before training, and mapped back to the original label convention when writing out predictions.
 
 ## Setup
 
+### 1. Clone the repository and install dependencies
+
 ```bash
+git clone <repository-url>
+cd brain_tumor_segmentation
 pip install -r requirements.txt
 ```
 
-Download the BraTS 2019 dataset (handled automatically via `src/data/loader.py` using the Kaggle API) or place it manually at:
+### 2. Obtain the dataset
+
+The dataset can be downloaded automatically via `src/data/loader.py` (using the Kaggle API), or placed manually at:
 
 ```
 Data/MICCAI_BraTS_2019_Data_Training/HGG/
 Data/MICCAI_BraTS_2019_Data_Training/LGG/
 ```
+
+Each patient subfolder must contain the four MRI modality files and the ground-truth segmentation file, following the naming convention used by `src/data/dataset.py`.
+
+### 3. Trained model weights (optional)
+
+Trained weights do not need to be produced locally to try inference: `scripts/api.py` automatically downloads `3D_UNet.keras` and `Swin_UNETR.keras` from the configured Hugging Face Hub repository into `Models/` the first time the API is started, if they are not already present.
 
 ## Usage
 
@@ -139,13 +199,19 @@ streamlit run scripts/streamlit_app.py
 Both trained models (`3D_UNet.keras` and `Swin_UNETR.keras`) are loaded at startup. Pick which one to run inference with via the `model` form field — `"UNET"` or `"SwinUNETR"`.
 
 ```bash
-curl -X POST http://localhost:8000/segment 
-  -F "model=UNET" 
-  -F "t1=@patient_t1.nii" 
-  -F "t1ce=@patient_t1ce.nii" 
-  -F "t2=@patient_t2.nii" 
-  -F "flair=@patient_flair.nii" 
+curl -X POST http://localhost:8000/segment \
+  -F "model=UNET" \
+  -F "t1=@patient_t1.nii" \
+  -F "t1ce=@patient_t1ce.nii" \
+  -F "t2=@patient_t2.nii" \
+  -F "flair=@patient_flair.nii" \
   -o seg.nii.gz
+```
+
+Health check:
+
+```bash
+curl http://localhost:8000/
 ```
 
 ## Model Architectures
@@ -159,68 +225,71 @@ Both are trained with a combined Dice + Cross-Entropy loss (`src/training/DiceLo
 -   **ED** (Peritumoral Edema)
 -   **ET** (Enhancing Tumor)
 
+Class weighting is applied in the loss function to counteract the large imbalance between background voxels and the (comparatively small) tumor sub-region voxels.
+
+## Training Configuration
+
+Key parameters, defined centrally in `configs/config.py`, include:
+
+| Parameter | Description |
+|---|---|
+| `VOLUME_SIZE` | Raw input volume dimensions before patching. |
+| `PATCH_SIZE` | Size of the 3D patches extracted for training and inference. |
+| `STRIDE` | Step size used when sliding the inference window across a full volume. |
+| `CLASS_WEIGHTS` | Per-class weights applied in the loss function to address class imbalance. |
+| `EPOCHS` | Number of training epochs. |
+| `MODELS` | Which architecture(s) to train (`unet`, `swin_unetr`). |
+
+Adjust these values to change patch size, training duration, or which model(s) get trained without touching the training script itself.
+
 ## Results
 
 Dice scores from evaluating on the held-out test split (`test_dir` in `scripts/train.py`). Replace the placeholder values below with your own numbers after training — printed by `UNET_Model.evaluate(test_dataset)` / `Swin_UNETR.evaluate(test_dataset)`, or computed per-patient via `src/training/mri_results.py`.
 
-Class
+| Class | 3D U-Net | Swin-UNETR |
+|---|---|---|
+| Whole Tumor (WT) | 0.00 | 0.00 |
+| Necrotic / Non-enhancing (NCR) | 0.00 | 0.00 |
+| Peritumoral Edema (ED) | 0.00 | 0.00 |
+| Enhancing Tumor (ET) | 0.00 | 0.00 |
+| **Mean Dice** | **0.00** | **0.00** |
 
-3D U-Net
+> WT, TC (Tumor Core = NCR + ET), and ET are the standard evaluation regions used in tumor segmentation benchmarks. NCR/ED/ET above are the raw per-class scores from `DiceLoss.py`; combine them (e.g. NCR + ET voxels for TC) if you want region-level scores instead of per-label scores.
 
-Swin-UNETR
+## Demo
 
-Whole Tumor (WT)
+<!--
+  Add a demo video or GIF here so it renders on GitHub.
 
-0.00
+  Option A - Drag-and-drop a short screen recording (mp4/mov) directly into
+  the README file editor on github.com (or into an issue/PR). GitHub hosts it
+  and gives you a link to paste, e.g.:
 
-0.00
+  https://github.com/<user>/<repo>/assets/<id>/<video-id>.mp4
 
-Necrotic / Non-enhancing (NCR)
+  Option B - Host on YouTube and use a clickable thumbnail (GitHub READMEs
+  cannot embed a native YouTube player):
 
-0.00
+  [![Watch the demo](https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=VIDEO_ID)
 
-0.00
+  Option C - Convert the recording to a GIF (e.g. with ffmpeg or Gifski) and
+  reference it directly, since GIFs autoplay inline on GitHub:
 
-Peritumoral Edema (ED)
+  ![Demo](assets/demo.gif)
+-->
 
-0.00
+A short walkthrough of the Streamlit UI (select model, upload the four MRI modalities, run segmentation, scroll through the slice viewer, download the mask) can be added here once recorded, using one of the embedding options above.
 
-0.00
+## Limitations
 
-Enhancing Tumor (ET)
-
-0.00
-
-0.00
-
-**Mean Dice**
-
-**0.00**
-
-**0.00**
-
-> WT, TC (Tumor Core = NCR + ET), and ET are the standard BraTS evaluation regions. NCR/ED/ET above are the raw per-class scores from `DiceLoss.py`; combine them (e.g. NCR + ET voxels for TC) if you want official BraTS-style region scores instead of per-label scores.
-
-### Target Dice (BraTS 2019 reference benchmarks)
-
-Region
-
-Target Dice
-
-Whole Tumor (WT)
-
-≥ 0.88
-
-Tumor Core (TC)
-
-≥ 0.78
-
-Enhancing Tumor (ET)
-
-≥ 0.70
-
-These are commonly cited reference targets for well-tuned BraTS models — useful as a rough benchmark, not a guarantee, since this project trains on BraTS 2019 data with a smaller/simpler pipeline.
+- Trained on a fixed set of four MRI modalities (T1, T1ce, T2, FLAIR); scans missing one or more modalities cannot be processed without modification.
+- Sliding-window inference assumes co-registered volumes of consistent orientation and spacing; scans that differ significantly from the training distribution may degrade segmentation quality.
+- Model performance depends on the size and diversity of the training cohort and has not been validated across multiple scanners, institutions, or patient populations.
 
 ## Disclaimer
 
 This project is for research and educational purposes only and is not intended for clinical use. Segmentation outputs must not be used for diagnosis or treatment decisions without review by qualified medical professionals.
+
+## License
+
+Released under the MIT License.
