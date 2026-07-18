@@ -258,25 +258,7 @@ Dice scores from evaluating on the held-out test split (`test_dir` in `scripts/t
 
 ## Demo
 
-<!--
-  Add a demo video or GIF here so it renders on GitHub.
-
-  Option A - Drag-and-drop a short screen recording (mp4/mov) directly into
-  the README file editor on github.com (or into an issue/PR). GitHub hosts it
-  and gives you a link to paste, e.g.:
-
-  https://github.com/<user>/<repo>/assets/<id>/<video-id>.mp4
-
-  Option B - Host on YouTube and use a clickable thumbnail (GitHub READMEs
-  cannot embed a native YouTube player):
-
-  [![Watch the demo](https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=VIDEO_ID)
-
-  Option C - Convert the recording to a GIF (e.g. with ffmpeg or Gifski) and
-  reference it directly, since GIFs autoplay inline on GitHub:
-
-  ![Demo](assets/demo.gif)
--->
+[![Watch the demo](https://youtu.be/UjHknx9umLM?si=yq_KWVV8j_Gdppor/0.jpg)]([https://www.youtube.com/watch?v=VIDEO_ID](https://youtu.be/UjHknx9umLM?si=yq_KWVV8j_Gdppor))
 
 A short walkthrough of the Streamlit UI (select model, upload the four MRI modalities, run segmentation, scroll through the slice viewer, download the mask) can be added here once recorded, using one of the embedding options above.
 
