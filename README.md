@@ -258,7 +258,7 @@ Dice scores from evaluating on the held-out test split (`test_dir` in `scripts/t
 
 ## Demo
 
-[![Watch the demo](https://youtu.be/UjHknx9umLM?si=yq_KWVV8j_Gdppor/0.jpg)]([https://www.youtube.com/watch?v=VIDEO_ID](https://youtu.be/UjHknx9umLM?si=yq_KWVV8j_Gdppor))
+[![Watch the demo](https://www.youtube.com/watch?v=UjHknx9umLM/0.jpg)](https://www.youtube.com/watch?v=UjHknx9umLM)
 
 A short walkthrough of the Streamlit UI (select model, upload the four MRI modalities, run segmentation, scroll through the slice viewer, download the mask) can be added here once recorded, using one of the embedding options above.
 
