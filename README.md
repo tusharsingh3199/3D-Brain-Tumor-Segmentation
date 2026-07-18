@@ -248,10 +248,10 @@ Dice scores from evaluating on the held-out test split (`test_dir` in `scripts/t
 
 | Class | 3D U-Net | Swin-UNETR |
 |---|---|---|
-| Whole Tumor (WT) | 0.00 | 0.00 |
-| Necrotic / Non-enhancing (NCR) | 0.00 | 0.00 |
-| Peritumoral Edema (ED) | 0.00 | 0.00 |
-| Enhancing Tumor (ET) | 0.00 | 0.00 |
+| Whole Tumor (WT) | 0.81 | 0.74 |
+| Necrotic / Non-enhancing (NCR) | 0.70 | 0.55 |
+| Peritumoral Edema (ED) | 0.80 | 0.71 |
+| Enhancing Tumor (ET) | 0.74 | 0.70 |
 | **Mean Dice** | **0.00** | **0.00** |
 
 > WT, TC (Tumor Core = NCR + ET), and ET are the standard evaluation regions used in tumor segmentation benchmarks. NCR/ED/ET above are the raw per-class scores from `DiceLoss.py`; combine them (e.g. NCR + ET voxels for TC) if you want region-level scores instead of per-label scores.
